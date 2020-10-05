@@ -1,0 +1,40 @@
+-a function that returns the sum of two numbers
+
+Given two numbers.
+Add the two numbers together and return that value.
+
+START
+# Given two numbers, a and b.
+PRINT sum of a and b.
+END
+
+
+-a function that takes an array of strings, and returns a string that is all those strings concatenated together
+
+Given an array of strings.
+Join all the strings in the array together.
+Return the new string.
+
+START
+# Given an array of strings.
+SET variable to an empty string
+WHILE iterator <= length of array
+	concatenate current value to string
+PRINT new string
+END
+
+
+-a function that takes an array of integers, and returns a new array with every other element
+
+Given an array of integers.
+Iterate over every odd element and add it to a new array.
+Return the new array.
+
+START
+# Given an array of integers
+SET newArr = empty array
+WHILE iterator <= length of array of integers in given array
+  IF position is an odd number
+    push integer at position to newArr
+PRINT newArr
+END
