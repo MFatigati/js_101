@@ -40,7 +40,6 @@ while (!['1', '2', '3', '4'].includes(operation)) {
   operation = rlSync.question();
 }
 
-
 let output;
 switch (operation) {
   case '1':
@@ -57,7 +56,6 @@ switch (operation) {
     break;
 }
 
-
 console.log(`The result is: ${output}`);
 
-
+prompt('What operation would you like to perform?\n1) Add 2) Subtract 3) Multiply 4) Divide');
