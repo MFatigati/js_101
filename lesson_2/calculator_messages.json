@@ -11,7 +11,8 @@
     "invalidChoice" : "يجب اختيار 1 أو 2 أو 3 أو 4",
     "again": "هل ترغب في إجراء عملية حسابية أخرى ('y' أو 'n')",
     "invalidAgain": "الرجاء إدخال 'y' أو 'n'",
-    "end": "الى اللقاء"
+    "end": "الى اللقاء",
+    "result": "النتيجة هي "
   },
   "es": {
     "welcome" : "¡Bienvenido a Calculadora!",
@@ -22,7 +23,8 @@
     "invalidChoice" : "Debe elegir 1, 2, 3 o 4",
     "again": "¿Le gustaría realizar otro cálculo ('y' o 'n')",
     "invalidAgain": "Ingrese 'y' o 'n'",
-    "end": "¡Adiós!"
+    "end": "¡Adiós!",
+    "result": "El resultado es "
   },
   "en": {
     "welcome" : "Welcome to Calculator!",
@@ -33,6 +35,7 @@
     "invalidChoice" : "Must choose 1, 2, 3 or 4",
     "again": "Would you like to perform another calculation ('y' or 'n')",
     "invalidAgain": "Please enter 'y' or 'n'",
-    "end": "Goodbye!"
+    "end": "Goodbye!",
+    "result": "The result is "
   }
 }

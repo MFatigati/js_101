@@ -75,10 +75,7 @@ do {
       break;
   }
 
-  console.log(`The result is: ${output}`);
-  // Is there a way to store this message in the JSON object?
-  // The variable seems to not work once it is stored in the JSON file.
-  // This is my first time working with a JSON file.
+  console.log(messages[language].result + output);
 
   prompt(messages[language].again);
   again = rlSync.question();
