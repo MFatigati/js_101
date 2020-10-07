@@ -28,7 +28,6 @@ while (invalidLang(language) === false) {
   language = rlSync.question();
 }
 
-
 prompt(messages[language].welcome);
 
 let again;
