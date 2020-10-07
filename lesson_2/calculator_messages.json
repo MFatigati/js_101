@@ -1,0 +1,38 @@
+{
+  "settings": {
+    "language" : "Please choose language by entering \n'ar' for Arabic, \n'es' for Spanish, \n'en' for English."
+  },
+  "ar": {
+    "welcome" : "مرحبا بكم في الآلة الحاسبة",
+    "firstNumPrompt" : "ما هو الرقم الأول؟",
+    "invalidNum" : "هذا لا يبدو أنه رقم صحيح",
+    "secondNumPrompt" : "ما هو الرقم الثاني؟",
+    "operationChoice" : "ما العملية التي تريد تنفيذها؟ (1) إضافة (2) طرح (3) ضرب (4) قسمة",
+    "invalidChoice" : "يجب اختيار 1 أو 2 أو 3 أو 4",
+    "again": "هل ترغب في إجراء عملية حسابية أخرى ('y' أو 'n')",
+    "invalidAgain": "الرجاء إدخال 'y' أو 'n'",
+    "end": "الى اللقاء"
+  },
+  "es": {
+    "welcome" : "¡Bienvenido a Calculadora!",
+    "firstNumPrompt" : "¿Cuál es el primer número?",
+    "invalidNum" : "Eso no parece un número válido.",
+    "secondNumPrompt" : "Cual es el segundo numero?",
+    "operationChoice" : "¿Qué operación te gustaría realizar? \n1) Sumar \n2) Restar \n3) Multiplicar \n4) Dividir",
+    "invalidChoice" : "Debe elegir 1, 2, 3 o 4",
+    "again": "¿Le gustaría realizar otro cálculo ('y' o 'n')",
+    "invalidAgain": "Ingrese 'y' o 'n'",
+    "end": "¡Adiós!"
+  },
+  "en": {
+    "welcome" : "Welcome to Calculator!",
+    "firstNumPrompt" : "What's the first number?",
+    "invalidNum" : "Hmm... that doesn't look like a valid number.",
+    "secondNumPrompt" : "What's the second number?",
+    "operationChoice" : "What operation would you like to perform?\n1) Add \n2) Subtract \n3) Multiply \n4) Divide",
+    "invalidChoice" : "Must choose 1, 2, 3 or 4",
+    "again": "Would you like to perform another calculation ('y' or 'n')",
+    "invalidAgain": "Please enter 'y' or 'n'",
+    "end": "Goodbye!"
+  }
+}
