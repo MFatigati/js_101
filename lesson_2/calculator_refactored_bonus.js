@@ -4,6 +4,8 @@
 // perform the operation on the two numbers
 // print result to terminal
 
+console.clear();
+
 let messages = require('./calculator_messages.json');
 
 const rlSync = require('readline-sync');
@@ -85,6 +87,7 @@ do {
     prompt(messages[language].invalidAgain);
     again = rlSync.question();
   }
+console.clear();
 }
 
 while (again === "y");
