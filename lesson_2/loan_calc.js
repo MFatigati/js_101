@@ -59,10 +59,10 @@ do {
 
     blankLine();
     prompt(messages.confirmInputs);
-    confirmAmounts = rlSync.prompt().toLowerCase();
+    confirmAmounts = rlSync.prompt().toLowerCase()[0];
     while (confirmAmounts !== "y" && confirmAmounts !== "n") {
       prompt(messages.invalidConfirmation);
-      confirmAmounts = rlSync.prompt().toLowerCase();
+      confirmAmounts = rlSync.prompt().toLowerCase()[0];
     }
     if (confirmAmounts === "n") {
       prompt(messages.tryAgain);
@@ -96,10 +96,10 @@ do {
 
   blankLine();
   prompt(messages.runAgain);
-  playAgain = rlSync.question().toLowerCase();
+  playAgain = rlSync.prompt().toLowerCase()[0];
   while (playAgain !== "y" && playAgain !== "n") {
     prompt(messages.invalidConfirmation);
-    playAgain = rlSync.prompt().toLowerCase();
+    playAgain = rlSync.prompt().toLowerCase()[0];
   }
 
   console.clear();
