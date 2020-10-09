@@ -1,0 +1,16 @@
+{
+  "greeting" : "Welcome to the loan calculator! I can help you calculate your monthly payment on a car or home loan.",
+  "inputLoanAmount" : "To get started, please enter the total loan amount:",
+  "invalidLoanAmount" : "Invalid entry. Please enter the total loan amount (e.g., $1000):",
+  "inputAPR" : "Now, please enter the Annual Percentage Rate (APR) as a percent (e.g., 10%, rather than .1):",
+  "invalidAPR" : "Invalid entry. Please enter the Annual Percentage Rate (APR) as a percent (e.g., 10%, rather than .1):",
+  "inputDuration" : "Finally, please enter the duration of your loan in years (you may enter partial years using decimal points, e.g., 1.5):",
+  "invalidDuration" : "Invalid entry. Please enter the duration of your loan in years:",
+  "displayInputs" : "Here's what we've got:",
+  "confirmInputs" : "Are these values correct? (y/n)",
+  "invalidConfirmation" : "Please enter 'y' or 'n'",
+  "tryAgain" : "Okay, let's try again...",
+  "displayPayment" : "Your monthly payment on this loan will be $",
+  "runAgain" : "Would you like to do another calculation? (y/n)",
+  "goodbye" : "Thanks for using the loan calculator!"
+}
