@@ -1,4 +1,4 @@
-console.clear();
+let messages = require('./loan_calc_messages.json'); // moved to top
 
 let rlSync = require('readline-sync');
 
@@ -15,22 +15,21 @@ function invalidInput(input) {
 }
 
 function getValidNumber() {
-  parseFloat(rlSync.prompt().replace(/,/g, '').match(/\d.*/));
+  return parseFloat(rlSync.prompt().replace(/,/g, '').match(/\d.*/)); // extracted to function
 }
 
-let messages = require('./loan_calc_messages.json');
-
+console.clear(); // moved from top
 prompt(messages.greeting);
 blankLine();
 
-let loanTotal;
-let loanAPR;
-let loanDurationYears;
-let confirmAmounts;
-let monthlyPayment;
-let playAgain;
-
 while (true) { //used generic while loops instead of do/while
+  // moved the below declarations out of global scope
+  let loanTotal;
+  let loanAPR;
+  let loanDurationYears;
+  // let confirmAmounts; moved this variable declaration to line 62
+  // let monthlyPayment; moved this variable declaration to line 77
+  // let playAgain; moved this variable declaration to line 99
 
   while (true) { //used generic while loops instead of do/while
     prompt(messages.inputLoanAmount);
@@ -63,21 +62,20 @@ while (true) { //used generic while loops instead of do/while
 
     blankLine();
     prompt(messages.confirmInputs);
-    confirmAmounts = rlSync.prompt().toLowerCase()[0];
+    let confirmAmounts = rlSync.prompt().toLowerCase()[0];
     while (confirmAmounts !== "y" && confirmAmounts !== "n") {
       prompt(messages.invalidConfirmation);
       confirmAmounts = rlSync.prompt().toLowerCase()[0];
     }
-    if (confirmAmounts === "n") {
+    if (confirmAmounts === "y") break; // removed unnecessary second if statement
       prompt(messages.tryAgain);
       blankLine();
-    }
-    if (confirmAmounts !== "n") break;
   }
 
   let loanDurationMonths = loanDurationYears * 12;
   let monthlyRate = (loanAPR / 100) / 12;
 
+  let monthyPayment;
   if (monthlyRate === 0) {
     monthlyPayment = (loanTotal / loanDurationMonths).toFixed(2);
   } else if (loanDurationMonths === 0) {
@@ -86,6 +84,7 @@ while (true) { //used generic while loops instead of do/while
     monthlyPayment = loanTotal * (monthlyRate /
     (1 - Math.pow((1 + monthlyRate), (-loanDurationMonths))));
     monthlyPayment = monthlyPayment.toFixed(2);
+    monthlyPayment = monthlyPayment.replace(/\B(?=(\d{3})+(?!\d))/g, ","); 
   }
 
   console.clear();
@@ -98,7 +97,7 @@ while (true) { //used generic while loops instead of do/while
 
   blankLine();
   prompt(messages.runAgain);
-  playAgain = rlSync.prompt().toLowerCase()[0];
+  let playAgain = rlSync.prompt().toLowerCase()[0];
   while (playAgain !== "y" && playAgain !== "n") {
     prompt(messages.invalidConfirmation);
     playAgain = rlSync.prompt().toLowerCase()[0];
@@ -106,7 +105,7 @@ while (true) { //used generic while loops instead of do/while
 
   console.clear();
 
-  if (playAgain !== "y") break;
+  if (playAgain === "n") break; // examine value in a positive manner
 }
 
 console.clear();
