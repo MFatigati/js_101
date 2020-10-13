@@ -14,10 +14,6 @@ function invalidInput(input) {
   return Number.isNaN(input); // simplified this line from (value !== value)
 }
 
-function getValidNumber() {
-  parseFloat(rlSync.prompt().replace(/,/g, '').match(/\d.*/));
-}
-
 let messages = require('./loan_calc_messages.json');
 
 prompt(messages.greeting);
@@ -34,24 +30,24 @@ while (true) { //used generic while loops instead of do/while
 
   while (true) { //used generic while loops instead of do/while
     prompt(messages.inputLoanAmount);
-    loanTotal = getValidNumber();
+    loanTotal = parseFloat(rlSync.prompt().replace(/,/g, '').match(/\d.*/));
     while (invalidInput(loanTotal)) {
       prompt(messages.invalidLoanAmount);
-      loanTotal = getValidNumber();
+      loanTotal = parseFloat(rlSync.prompt().replace(/,/g, '').match(/\d.*/));
     }
 
     prompt(messages.inputAPR);
-    loanAPR = getValidNumber();
+    loanAPR = parseFloat(rlSync.prompt().replace(/,/g, '').match(/\d.*/));
     while (invalidInput(loanAPR)) {
       prompt(messages.invalidAPR);
-      loanAPR = getValidNumber();
+      loanAPR = parseFloat(rlSync.prompt().replace(/,/g, '').match(/\d.*/));
     }
 
     prompt(messages.inputDuration);
-    loanDurationYears = getValidNumber();
+    loanDurationYears = parseFloat(rlSync.prompt().replace(/,/g, '').match(/\d.*/));
     while (invalidInput(loanDurationYears)) {
       prompt(messages.invalidDuration);
-      loanDurationYears = getValidNumber();
+      loanDurationYears = parseFloat(rlSync.prompt().replace(/,/g, '').match(/\d.*/));
     }
 
     blankLine();

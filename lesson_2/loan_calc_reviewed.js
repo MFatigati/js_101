@@ -18,6 +18,17 @@ function getValidNumber() {
   return parseFloat(rlSync.prompt().replace(/,/g, '').match(/\d.*/)); // extracted to function
 }
 
+function insertCommas(string) {
+  stringArr = string.split("").reverse();
+  console.log(stringArr);
+  for (let i = 4; i < stringArr.length; i += 1) {
+    if ((i+1) % 3 === 0) {
+      stringArr[i] = `,${stringArr[i]}`;
+    }
+  }
+  return stringArr.reverse().join("");
+}
+
 console.clear(); // moved from top
 prompt(messages.greeting);
 blankLine();
@@ -75,7 +86,7 @@ while (true) { //used generic while loops instead of do/while
   let loanDurationMonths = loanDurationYears * 12;
   let monthlyRate = (loanAPR / 100) / 12;
 
-  let monthyPayment;
+  let monthlyPayment;
   if (monthlyRate === 0) {
     monthlyPayment = (loanTotal / loanDurationMonths).toFixed(2);
   } else if (loanDurationMonths === 0) {
@@ -84,7 +95,7 @@ while (true) { //used generic while loops instead of do/while
     monthlyPayment = loanTotal * (monthlyRate /
     (1 - Math.pow((1 + monthlyRate), (-loanDurationMonths))));
     monthlyPayment = monthlyPayment.toFixed(2);
-    monthlyPayment = monthlyPayment.replace(/\B(?=(\d{3})+(?!\d))/g, ","); 
+    monthlyPayment = insertCommas(monthlyPayment); // replaced complicated regex with helper function
   }
 
   console.clear();
