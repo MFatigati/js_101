@@ -1,0 +1,8 @@
+{
+  "choice" : "Choose one: rock, paper, scissors, lizard, Spock (you may enter just the first letter, case-sensitive: r, p, s, l, S",
+  "invalidChoice" : "That's not a valid choice",
+  "playAgain" : "Do you want to play again (y/n)?",
+  "invalidPlayAgain" : "Please enter \"y\" or \"n\".",
+  "playerWins" : "5 victories for you! Computer is vanquished.",
+  "computerWins" : "Computer won 5 times. Game over."
+}
