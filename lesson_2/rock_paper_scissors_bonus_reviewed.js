@@ -106,6 +106,21 @@ function blankLine() {
   console.log("");
 }
 
+function displayGameStatus(playerCount, computerCount) {
+  if (playerCount < 5 && computerCount < 5) {
+    prompt(`Score (first to five is grand winner):
+    player = ${playerCount}, computer = ${computerCount}, ties = ${tieCount}
+    (total matches = ${totalGames})`);
+  } else if (playerCount === 5) {
+    prompt(messages.playerWins);
+    blankLine();
+    break;
+  } else if (computerCount === 5) {
+    prompt(messages.computerWins);
+    blankLine();
+    break;
+  }}
+
 //variations on the above function
 /* function generateRandomInx() {
   return Math.ceil(((Math.random() * (VALID_CHOICES.length)) - 1));
@@ -156,7 +171,10 @@ while (true) {
   }
 
   blankLine();
-  if (playerCount < 5 && computerCount < 5) {
+
+  displayGameStatus(playerCount, computerCount);
+
+  /* if (playerCount < 5 && computerCount < 5) {
     prompt(`Score (first to five is grand winner):
     player = ${playerCount}, computer = ${computerCount}, ties = ${tieCount}
     (total matches = ${totalGames})`);
@@ -168,7 +186,7 @@ while (true) {
     prompt(messages.computerWins);
     blankLine();
     break;
-  }
+    } */
 
   blankLine();
   prompt(messages.playAgain);
