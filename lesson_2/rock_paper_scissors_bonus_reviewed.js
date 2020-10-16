@@ -63,17 +63,6 @@ function returnWinner(choice, computerChoice) {
   }
 } */
 
-function displayWinner(playerChoice, computerChoice, comboObject) {
-  prompt(`You chose ${playerChoice}, computer chose ${computerChoice}`);
-  if (comboObject[playerChoice].includes(computerChoice)) {
-    prompt('You win!');
-  } else if (playerChoice === computerChoice) {
-    prompt("It's a tie");
-  } else {
-    prompt('Computer wins!');
-  }
-}
-
 function returnWinner(playerChoice, computerChoice, comboObject) {
   if (comboObject[playerChoice].includes(computerChoice)) {
     return "player";
@@ -81,6 +70,17 @@ function returnWinner(playerChoice, computerChoice, comboObject) {
     return "tie";
   } else {
     return "computer";
+  }
+}
+
+function displayWinner(playerChoice, computerChoice, winner) {
+  prompt(`You chose ${playerChoice}, computer chose ${computerChoice}`);
+  if (winner === "player") {
+    prompt('You win!');
+  } else if (playerChoice === computerChoice) {
+    prompt("It's a tie");
+  } else {
+    prompt('Computer wins!');
   }
 }
 
@@ -142,18 +142,17 @@ while (true) {
   regardless of what the user chose. */
 
   blankLine();
+  
+  let currentWinner = returnWinner(revisedUserChoice, computerChoice, WINNING_COMBOS);
+  displayWinner(revisedUserChoice, computerChoice, currentWinner);
+  totalGames += 1;
 
-  displayWinner(revisedUserChoice, computerChoice, WINNING_COMBOS);
-
-  if (returnWinner(revisedUserChoice, computerChoice, WINNING_COMBOS) === "player") {
+  if (currentWinner === "player") {
     playerCount += 1;
-    totalGames += 1;
-  } else if (returnWinner(revisedUserChoice, computerChoice, WINNING_COMBOS) === "computer") {
+  } else if (currentWinner) {
     computerCount += 1;
-    totalGames += 1;
-  } else if (returnWinner(revisedUserChoice, computerChoice, WINNING_COMBOS) === "tie") {
+  } else if (currentWinner) {
     tieCount += 1;
-    totalGames += 1;
   }
 
   blankLine();
