@@ -106,7 +106,17 @@ function blankLine() {
   console.log("");
 }
 
-function displayGameStatus(playerCount, computerCount) {
+function determineGameStatus(playerCount, computerCount, tieCount, totalGames) {
+  if (playerCount < 5 && computerCount < 5) {
+    return "tbd";
+  } else if (playerCount === 5) {
+    return "player grand winner";
+  } else if (computerCount === 5) {
+    return "computer grand winner";
+  }
+}
+
+function displayGameStatus(playerCount, computerCount, tieCount, totalGames) {
   if (playerCount < 5 && computerCount < 5) {
     prompt(`Score (first to five is grand winner):
     player = ${playerCount}, computer = ${computerCount}, ties = ${tieCount}
@@ -114,11 +124,9 @@ function displayGameStatus(playerCount, computerCount) {
   } else if (playerCount === 5) {
     prompt(messages.playerWins);
     blankLine();
-    break;
   } else if (computerCount === 5) {
     prompt(messages.computerWins);
     blankLine();
-    break;
   }}
 
 //variations on the above function
@@ -172,7 +180,12 @@ while (true) {
 
   blankLine();
 
-  displayGameStatus(playerCount, computerCount);
+  let gameStatus = determineGameStatus(playerCount, computerCount, tieCount, totalGames);
+  displayGameStatus(playerCount, computerCount, tieCount, totalGames);
+  
+  if (gameStatus === "player grand winner" || gameStatus === "computer grand winner") {
+    break;
+  }
 
   /* if (playerCount < 5 && computerCount < 5) {
     prompt(`Score (first to five is grand winner):
