@@ -24,7 +24,7 @@ A
 
 */
 
-/* function substrings(str) {
+function substrings(str) {
   let newArr = [];
   for (let i = 0; i < str.length; i += 1) {
     let subStr1 = str.slice(i);
@@ -33,7 +33,9 @@ A
   return newArr.flat();
   
 }
- */
+
+
+ // further exp with map
 function substrings(str) {
   let subStrArr = str.split("").map((char, idx) => {
     return char + str.slice(idx + 1);
