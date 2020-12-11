@@ -138,7 +138,7 @@ function joinOr(arr, generalDelim = ",", lastDelim = "or") {
   }
 }
 
-function updateScore(board, playerScore, computerScore, ties) {
+/* function updateScore(board, playerScore, computerScore, ties) {
   if (detectWinner(board) === "Player") {
     playerScore += 1;
   } else if (detectWinner(board) === "Computer") {
@@ -146,7 +146,7 @@ function updateScore(board, playerScore, computerScore, ties) {
   } else {
     ties += 1;
   }
-}
+} */
 
 function displayScore(computerScore, playerScore, ties) {
   console.log(
@@ -187,15 +187,15 @@ while (true) { // this loop starts a new game
     prompt("It's a tie!");
   }
   
-  /* if (detectWinner(board) === "Player") { // functionality of updateScore() works when not deployed as a function
+  if (detectWinner(board) === "Player") { // functionality of updateScore() works when not deployed as a function
     playerScore += 1;
   } else if (detectWinner(board) === "Computer") {
     computerScore += 1;
   } else {
     ties += 1;
-  } */
+  }
 
-  updateScore(board, playerScore, computerScore, ties); // this function does not seem to be updating the broader variable
+  // updateScore(board, playerScore, computerScore, ties); // this function does not seem to be updating the broader variable
   displayScore(computerScore, playerScore, ties);
 
   

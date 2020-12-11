@@ -138,7 +138,7 @@ function joinOr(arr, generalDelim = ",", lastDelim = "or") {
   }
 }
 
-function updateScore(board, playerScore, computerScore, ties) {
+function updateScore(board) {
   if (detectWinner(board) === "Player") {
     playerScore += 1;
   } else if (detectWinner(board) === "Computer") {
@@ -195,7 +195,7 @@ while (true) { // this loop starts a new game
     ties += 1;
   } */
 
-  updateScore(board, playerScore, computerScore, ties); // this function does not seem to be updating the broader variable
+  updateScore(board); // this function does not seem to be updating the broader variable
   displayScore(computerScore, playerScore, ties);
 
   
