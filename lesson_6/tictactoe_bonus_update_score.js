@@ -138,19 +138,31 @@ function joinOr(arr, generalDelim = ",", lastDelim = "or") {
   }
 }
 
-function displayScore(computerScore, playerScore, ties) {
+function updateScore(board, scores) {
+  if (detectWinner(board) === "Player") {
+    scores.playerScore += 1;
+  } else if (detectWinner(board) === "Computer") {
+    scores.computerScore += 1;
+  } else {
+    scores.ties += 1;
+  }
+}
+
+function displayScore(scores) {
   console.log(
 ` 
-Computer: ${computerScore}, Player: ${playerScore}, Ties ${ties}
+Computer: ${scores.computerScore}, Player: ${scores.playerScore}, Ties ${scores.ties}
 (first to ${GAMES_REQUIRED_TO_WIN} wins match)
  `)
 }
 
 
 while (true) { // this loop starts a new match
-let computerScore = 0;
-let playerScore = 0;
-let ties = 0;
+let scores = { // store these in an object so that updateScore function can reference the same object on each loop
+  computerScore: 0,
+  playerScore: 0,
+  ties: 0
+}
 let matchAnswer;
 let gameAnswer;
 
@@ -176,30 +188,12 @@ while (true) { // this loop starts a new game
   } else {
     prompt("It's a tie!");
   }
-  
-  /* if (detectWinner(board) === "Player") { // functionality of updateScore() works when not deployed as a function
-    playerScore += 1;
-  } else if (detectWinner(board) === "Computer") {
-    computerScore += 1;
-  } else {
-    ties += 1;
-  } */
 
-  function updateScore() { // function needs to be declared within the scope of the variables it is using in order to modify them.
-    if (detectWinner(board) === "Player") {
-      playerScore += 1;
-    } else if (detectWinner(board) === "Computer") {
-      computerScore += 1;
-    } else {
-      ties += 1;
-    }
-  }
-
-  updateScore(board); // this function does not seem to be updating the broader variable
-  displayScore(computerScore, playerScore, ties);
+  updateScore(board, scores);
+  displayScore(scores);
 
   
-  if (computerScore < GAMES_REQUIRED_TO_WIN && playerScore < GAMES_REQUIRED_TO_WIN) {
+  if (scores.computerScore < GAMES_REQUIRED_TO_WIN && scores.playerScore < GAMES_REQUIRED_TO_WIN) {
 
 
   prompt("Play new game? (y or n)");
@@ -208,7 +202,7 @@ while (true) { // this loop starts a new game
   
   
   if (gameAnswer !== 'y') break;
-  if (computerScore >= GAMES_REQUIRED_TO_WIN || playerScore >= GAMES_REQUIRED_TO_WIN) break;
+  if (scores.computerScore >= GAMES_REQUIRED_TO_WIN || scores.playerScore >= GAMES_REQUIRED_TO_WIN) break;
 
 }
   prompt("Play new match? (y or n)");

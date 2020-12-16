@@ -28,6 +28,11 @@ const INITIAL_MARKER = " ";
 const HUMAN_MARKER = "X";
 const COMPUTER_MARKER = "O";
 const GAMES_REQUIRED_TO_WIN = 2;
+const WINNING_LINES = [
+  [1, 2, 3], [4, 5, 6], [7, 8, 9], // rows
+  [1, 4, 7], [2, 5, 8], [3, 6, 9], // columns
+  [1, 5, 9], [3, 5, 7]             // diagonals
+];
 
 function displayBoard(board) {
   console.clear()
@@ -95,15 +100,55 @@ function someoneWon(board) {
   return !!detectWinner(board);
 }
 
-function detectWinner(board) {
-  let winningLines = [
-    [1, 2, 3], [4, 5, 6], [7, 8, 9], // rows
-    [1, 4, 7], [2, 5, 8], [3, 6, 9], // columns
-    [1, 5, 9], [3, 5, 7]             // diagonals
-  ];
+function detectImmediateThreat(board) {
+  for (let line = 0; line < WINNING_LINES.length; line ++) {
+    let [sq1, sq2, sq3] = WINNING_LINES[line];
 
-  for (let line = 0; line < winningLines.length; line ++) {
-    let [sq1, sq2, sq3] = winningLines[line];
+    let threatCounter = 0;
+    let occupiedByComputer = 0;
+
+    if (board[sq1] === HUMAN_MARKER) {
+      threatCounter += 1;
+    }
+    if (board[sq1] === COMPUTER_MARKER) {
+      occupiedByComputer += 1;
+    }
+    if (board[sq2] === HUMAN_MARKER) {
+      threatCounter += 1;
+    }
+    if (board[sq2] === COMPUTER_MARKER) {
+      occupiedByComputer += 1;
+    }
+    if (board[sq3] === HUMAN_MARKER) {
+      threatCounter += 1;
+    }
+    if (board[sq3] === COMPUTER_MARKER) {
+      occupiedByComputer += 1;
+    }
+
+    if (threatCounter === 2 && occupiedByComputer === 0) {
+      return line;
+    }
+}}
+
+function stopImmediateThreat(board, threatenedLine) { 
+  // function should assign square to computer marker needed to stop immediate threat
+  // threatened line will be the return value of the detectImmediateThreat function
+  let threatPossibilities = WINNING_LINES[threatenedLine];
+  let threatenedSquare;
+
+  for (let space = 0; space < threatPossibilities.length; space += 1) {
+    let boardSpaceCheck = board[String(threatPossibilities[space])];
+    if (boardSpaceCheck !== HUMAN_MARKER) {
+      threatenedSquare = String(threatPossibilities[space]);
+      board[threatenedSquare] = COMPUTER_MARKER;
+    }
+  }
+}
+
+function detectWinner(board) {
+  for (let line = 0; line < WINNING_LINES.length; line ++) {
+    let [sq1, sq2, sq3] = WINNING_LINES[line];
 
     if (
       board[sq1] === HUMAN_MARKER &&
@@ -138,29 +183,31 @@ function joinOr(arr, generalDelim = ",", lastDelim = "or") {
   }
 }
 
-function updateScore(board, playerScore, computerScore, ties) {
+function updateScore(board, scores) {
   if (detectWinner(board) === "Player") {
-    playerScore += 1;
+    scores.playerScore += 1;
   } else if (detectWinner(board) === "Computer") {
-    computerScore += 1;
+    scores.computerScore += 1;
   } else {
-    ties += 1;
+    scores.ties += 1;
   }
 }
 
-function displayScore(computerScore, playerScore, ties) {
+function displayScore(scores) {
   console.log(
 ` 
-Computer: ${computerScore}, Player: ${playerScore}, Ties ${ties}
+Computer: ${scores.computerScore}, Player: ${scores.playerScore}, Ties ${scores.ties}
 (first to ${GAMES_REQUIRED_TO_WIN} wins match)
  `)
 }
 
 
 while (true) { // this loop starts a new match
-let computerScore = 0;
-let playerScore = 0;
-let ties = 0;
+let scores = {
+  computerScore: 0,
+  playerScore: 0,
+  ties: 0
+}
 let matchAnswer;
 let gameAnswer;
 
@@ -171,11 +218,21 @@ while (true) { // this loop starts a new game
 
   
     displayBoard(board);
-  
+
+    // was using the logs below to test for computer defensive AI functionality
+    console.log(detectImmediateThreat(board)); // properly shows which line of the WINNING_LINES object is vulnerable
+    console.log(board); // testing for bug on second to last input: sometimes won't let me choose 7, but seven is available
+    console.log(emptySquares(board)) // testing for bug on second to last input: sometimes won't let me choose 7, but seven is available
+
     playerChoosesSquare(board);
     if (someoneWon(board) || boardFull(board)) break;
 
-    computerChoosesSquare(board);
+    
+    if (typeof detectImmediateThreat(board) === "number") { // if this returns a zero for the first line, it won't trigger the code to run
+      stopImmediateThreat(board, detectImmediateThreat(board))
+    } else {
+      computerChoosesSquare(board);
+    } 
     if (someoneWon(board) || boardFull(board)) break;
   }
 
@@ -186,36 +243,26 @@ while (true) { // this loop starts a new game
   } else {
     prompt("It's a tie!");
   }
-  
-  /* if (detectWinner(board) === "Player") { // functionality of updateScore() works when not deployed as a function
-    playerScore += 1;
-  } else if (detectWinner(board) === "Computer") {
-    computerScore += 1;
-  } else {
-    ties += 1;
-  } */
 
-  updateScore(board, playerScore, computerScore, ties); // this function does not seem to be updating the broader variable
-  displayScore(computerScore, playerScore, ties);
+  updateScore(board, scores);
+  displayScore(scores);
 
   
-  if (computerScore < GAMES_REQUIRED_TO_WIN && playerScore < GAMES_REQUIRED_TO_WIN) {
+  if (scores.computerScore < GAMES_REQUIRED_TO_WIN && scores.playerScore < GAMES_REQUIRED_TO_WIN) {
 
 
   prompt("Play new game? (y or n)");
   gameAnswer = rlSync.question().toLowerCase()[0];}
   // if answer is yes, reset scores for a new match to 5
   
-  
   if (gameAnswer !== 'y') break;
-  if (computerScore >= GAMES_REQUIRED_TO_WIN || playerScore >= GAMES_REQUIRED_TO_WIN) break;
+  if (scores.computerScore >= GAMES_REQUIRED_TO_WIN || scores.playerScore >= GAMES_REQUIRED_TO_WIN) break;
 
 }
   prompt("Play new match? (y or n)");
   matchAnswer = rlSync.question().toLowerCase()[0];
   if (matchAnswer !== 'y') break;
   
-
 }
 
-prompt ('Thanks for playing Tic Tac Toe!')
+prompt ('Thanks for playing Tic Tac Toe!');
