@@ -27,17 +27,19 @@ const rlSync = require("readline-sync");
 const INITIAL_MARKER = " ";
 const HUMAN_MARKER = "X";
 const COMPUTER_MARKER = "O";
-const GAMES_REQUIRED_TO_WIN = 2;
+const GAMES_REQUIRED_TO_WIN = 3;
+const POSSIBLE_STARTING_PLAYERS = ["player", "computer", "choice"]
 const WINNING_LINES = [
   [1, 2, 3], [4, 5, 6], [7, 8, 9], // rows
   [1, 4, 7], [2, 5, 8], [3, 6, 9], // columns
   [1, 5, 9], [3, 5, 7]             // diagonals
 ];
 
-function displayBoard(board) {
+function displayBoard(board, startingPlayer) {
   console.clear()
 
-  console.log(`You are ${HUMAN_MARKER}. Computer is ${COMPUTER_MARKER}`)
+  console.log(`You are ${HUMAN_MARKER}. Computer is ${COMPUTER_MARKER}.
+Starting for this game: ${startingPlayer}`)
 
   console.log(`
      |     |
@@ -54,6 +56,49 @@ function displayBoard(board) {
 `)
 }
 
+function acceptStartingMethod() {
+  console.clear();
+  let acceptTerms = rlSync.question(`Welcome to Tic Tac Toe! Here are some ground rules:
+
+Who goes first? For each individual game, the program will--randomly--either assign "player" or "computer" as the starting player, or ask you to choose.
+
+How to win? A match is composed of games, and the match is won by whoever wins ${GAMES_REQUIRED_TO_WIN} games first.
+
+Are you ready to begin? (enter "yes" or "no"): `)
+  acceptTerms = acceptTerms.trim()[0].toLowerCase();
+
+  while (acceptTerms !== "y" && acceptTerms !== "n") {
+    acceptTerms = rlSync.question(`Invalid choice. Please enter "yes" or "no": `)
+  }
+
+  if (acceptTerms === "y") {
+    return true;
+  } else return false;
+}
+
+function determineStartingPlayer() {
+  let playerChoice;
+  let startingPlayer = POSSIBLE_STARTING_PLAYERS[Math.floor(Math.random()*POSSIBLE_STARTING_PLAYERS.length)]
+
+  if (startingPlayer === "choice") {
+  playerChoice = rlSync.question(`Choose starting player (enter 'p' for player, or 'c' for computer): `).trim()[0].toLowerCase();
+
+  while (playerChoice !== "p" && playerChoice !== "c") {
+    playerChoice = rlSync.question(`Invalid choice. Please enter 'p' for player, or 'c' for computer: `).trim()[0].toLowerCase();
+  }
+
+   if (playerChoice === "p") {
+     startingPlayer = POSSIBLE_STARTING_PLAYERS[0];
+   }
+   if (playerChoice === "c") {
+     startingPlayer = POSSIBLE_STARTING_PLAYERS[1];
+   }
+
+  }
+
+  return startingPlayer;
+}
+
 function initializeBoard() {
   let board = {};
 
@@ -68,7 +113,7 @@ function playerChoosesSquare(board) {
 
   while (true) {
   prompt(`Choose a square ${joinOr(emptySquares(board))}:`);
-  square = rlSync.question().trim();
+  square = rlSync.prompt().trim();
   if (emptySquares(board).includes(square)) break;
   
   prompt("Sorry, that's not a valid choice.")
@@ -77,7 +122,7 @@ function playerChoosesSquare(board) {
   board[square] = HUMAN_MARKER;
 }
 
-function computerChoosesSquare(board) {
+function computerChoosesRandomSquare(board) {
   let randomIndex = Math.floor(Math.random() * emptySquares(board).length);
 
   let square = emptySquares(board)[randomIndex];
@@ -98,6 +143,30 @@ function boardFull(board) {
 
 function someoneWon(board) {
   return !!detectWinner(board);
+}
+
+function detectImmediateVictory(board) { // simplified code compared to detectImmediateThreat function
+  for (let line = 0; line < WINNING_LINES.length; line ++) {
+    let currentLineMarkers = WINNING_LINES[line].map(sq => board[sq])
+    if (currentLineMarkers.filter(sq => sq === COMPUTER_MARKER).length === 2 &&
+        currentLineMarkers.filter(sq => sq === HUMAN_MARKER).length === 0) {
+          return line
+    }
+  }
+}
+
+function claimImmediateVictory(board, availableWinningLine) {
+  // availableWinningLine will be the return value of the detectImmediateVictory function
+  let winningLinePossibitlies = WINNING_LINES[availableWinningLine];
+  let winningSquare;
+
+  for (let space = 0; space < winningLinePossibitlies.length; space += 1) {
+    let boardSpaceCheck = board[String(winningLinePossibitlies[space])];
+    if (boardSpaceCheck !== COMPUTER_MARKER) {
+      winningSquare = String(winningLinePossibitlies[space]);
+      board[winningSquare] = COMPUTER_MARKER;
+    }
+  }
 }
 
 function detectImmediateThreat(board) {
@@ -144,6 +213,30 @@ function stopImmediateThreat(board, threatenedLine) {
       board[threatenedSquare] = COMPUTER_MARKER;
     }
   }
+}
+
+function isFiveEmpty(board) {
+  if (board["5"] === " ") {
+    return true;
+  }
+}
+
+function chooseFiveFirst(board) {
+  if (board["5"] === " ") {
+    board[5] = COMPUTER_MARKER;
+  }
+}
+
+function computerChoosesSquare(board) {
+  if (isFiveEmpty(board)) {
+    chooseFiveFirst(board);
+  } else if (detectImmediateVictory(board) !== undefined) {
+    claimImmediateVictory(board, detectImmediateVictory(board))
+  } else if (detectImmediateThreat(board) !== undefined) {
+    stopImmediateThreat(board, detectImmediateThreat(board))
+  } else {
+    computerChoosesRandomSquare(board);
+  } 
 }
 
 function detectWinner(board) {
@@ -201,6 +294,37 @@ Computer: ${scores.computerScore}, Player: ${scores.playerScore}, Ties ${scores.
  `)
 }
 
+function chooseSquare(board, currentPlayer) {
+  if (currentPlayer === "player") {
+    playerChoosesSquare(board);
+  } else if (currentPlayer === "computer") {
+  computerChoosesSquare(board)
+  }
+}
+
+function alternatePlayer(currentPlayer) {
+  return currentPlayer === "player" ? "computer" : "player";
+}
+
+function displayMatchOver(scores) {
+  for (let player in scores) {
+    if (scores[player] === GAMES_REQUIRED_TO_WIN) {
+      console.log(`=> ${convertScoretoDisplayName(player)} wins the match!`)
+    }
+  }
+}
+
+function convertScoretoDisplayName (scoreName) {
+  if (scoreName === "computerScore") {
+    return "Computer";
+  } else if (scoreName === "playerScore") {
+    return "Player";
+  }
+}
+
+let acceptTerms = acceptStartingMethod();
+
+if (acceptTerms) {
 
 while (true) { // this loop starts a new match
 let scores = {
@@ -213,37 +337,26 @@ let gameAnswer;
 
 while (true) { // this loop starts a new game
   let board = initializeBoard();
+  console.clear();
 
-  while (true) { // this loop runs until there is a winner for the game, or the board is full
+  let startingPlayer = determineStartingPlayer();
+  let currentPlayer = startingPlayer;
 
-  
-    displayBoard(board);
-
-    // was using the logs below to test for computer defensive AI functionality
-    console.log(detectImmediateThreat(board)); // properly shows which line of the WINNING_LINES object is vulnerable
-    console.log(board); // testing for bug on second to last input: sometimes won't let me choose 7, but seven is available
-    console.log(emptySquares(board)) // testing for bug on second to last input: sometimes won't let me choose 7, but seven is available
-
-    playerChoosesSquare(board);
-    if (someoneWon(board) || boardFull(board)) break;
-
-    
-    if (typeof detectImmediateThreat(board) === "number") { // if this returns a zero for the first line, it won't trigger the code to run
-      stopImmediateThreat(board, detectImmediateThreat(board))
-    } else {
-      computerChoosesSquare(board);
-    } 
+  while (true) {
+    displayBoard(board, startingPlayer);
+    chooseSquare(board, currentPlayer);
+    currentPlayer = alternatePlayer(currentPlayer); // why does the program still work with this commented out?
     if (someoneWon(board) || boardFull(board)) break;
   }
 
-  displayBoard(board);
+  displayBoard(board, startingPlayer);
 
   if (someoneWon(board)) {
-    prompt(`${detectWinner(board)} won!`);
+    prompt(`${detectWinner(board)} won this game.`);
   } else {
     prompt("It's a tie!");
   }
-
+  
   updateScore(board, scores);
   displayScore(scores);
 
@@ -252,17 +365,29 @@ while (true) { // this loop starts a new game
 
 
   prompt("Play new game? (y or n)");
-  gameAnswer = rlSync.question().toLowerCase()[0];}
-  // if answer is yes, reset scores for a new match to 5
+  gameAnswer = rlSync.prompt().toLowerCase()[0];
+  while (gameAnswer !== 'y' && gameAnswer !== 'n') {
+    gameAnswer = rlSync.question("Invalid choice. Please enter y or n: ").toLowerCase()[0];
+  }
+}  // if answer is yes, reset scores for a new match to 5
   
   if (gameAnswer !== 'y') break;
   if (scores.computerScore >= GAMES_REQUIRED_TO_WIN || scores.playerScore >= GAMES_REQUIRED_TO_WIN) break;
 
 }
+  
+  displayMatchOver(scores);
+  prompt(" ")
+
   prompt("Play new match? (y or n)");
-  matchAnswer = rlSync.question().toLowerCase()[0];
+  matchAnswer = rlSync.prompt().toLowerCase()[0];
+  while (matchAnswer !== 'y' && matchAnswer !== 'n') {
+    matchAnswer = rlSync.question("Invalid choice. Please enter y or n: ").toLowerCase()[0];
+  }
   if (matchAnswer !== 'y') break;
   
 }
-
+}
+console.clear();
 prompt ('Thanks for playing Tic Tac Toe!');
+prompt(" ");
