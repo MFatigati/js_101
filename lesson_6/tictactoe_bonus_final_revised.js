@@ -27,8 +27,12 @@ const rlSync = require("readline-sync");
 const INITIAL_MARKER = " ";
 const HUMAN_MARKER = "X";
 const COMPUTER_MARKER = "O";
-const GAMES_REQUIRED_TO_WIN = 3;
-const POSSIBLE_STARTING_PLAYERS = ["player", "computer", "choice"];
+const GAMES_REQUIRED_TO_WIN = 2;
+const POSSIBLE_STARTING_PLAYERS = {
+  player: "player",
+  computer: "computer",
+  choice: "choice"
+};
 const WINNING_LINES = [
   [1, 2, 3], [4, 5, 6], [7, 8, 9], // rows
   [1, 4, 7], [2, 5, 8], [3, 6, 9], // columns
@@ -77,8 +81,9 @@ Are you ready to begin? (enter "yes" or "no"): `);
 
 function determineStartingPlayer() {
   let playerChoice;
-  let startingPlayer = POSSIBLE_STARTING_PLAYERS[Math.floor(Math.random()
-    * POSSIBLE_STARTING_PLAYERS.length)];
+  let startingPlayer =
+    Object.keys(POSSIBLE_STARTING_PLAYERS)[Math.floor(Math.random()
+    * Object.keys(POSSIBLE_STARTING_PLAYERS).length)];
 
   if (startingPlayer === "choice") {
     playerChoice = rlSync.question(`Choose starting player (enter 'p' for player, or 'c' for computer): `).trim()[0].toLowerCase();
@@ -88,10 +93,10 @@ function determineStartingPlayer() {
     }
 
     if (playerChoice === "p") {
-      startingPlayer = POSSIBLE_STARTING_PLAYERS[0];
+      startingPlayer = POSSIBLE_STARTING_PLAYERS["player"];
     }
     if (playerChoice === "c") {
-      startingPlayer = POSSIBLE_STARTING_PLAYERS[1];
+      startingPlayer = POSSIBLE_STARTING_PLAYERS["computer"];
     }
 
   }
@@ -153,6 +158,7 @@ function detectImmediateVictory(board) { // simplified code compared to detectIm
       return line;
     }
   }
+  return undefined;
 }
 
 function claimImmediateVictory(board, availableWinningLine) {
@@ -200,6 +206,7 @@ function detectImmediateThreat(board) { // simplified similar code for detectImm
       return line;
     }
   }
+  return undefined;
 }
 
 function stopImmediateThreat(board, threatenedLine) {
@@ -219,11 +226,11 @@ function stopImmediateThreat(board, threatenedLine) {
 }
 
 function isFiveEmpty(board) {
-  return board["5"] === " ";
+  return board["5"] === INITIAL_MARKER;
 }
 
 function chooseFiveFirst(board) {
-  if (board["5"] === " ") {
+  if (board["5"] === INITIAL_MARKER) {
     board[5] = COMPUTER_MARKER;
   }
 }
@@ -268,9 +275,11 @@ function joinOr(arr, generalDelim = ",", lastDelim = "or") {
     case 0:
       return string;
     case 1:
-      return string += arr[0];
+      string += arr[0];
+      return string;
     case 2:
-      return string += arr[0] + " " + lastDelim.trim() + " " + arr[1];
+      string += arr[0] + " " + lastDelim.trim() + " " + arr[1];
+      return string;
     default:
       return arr.slice(0, arr.length - 1).join(generalDelim.trim() + " ") +
       generalDelim.trim() + " " + lastDelim.trim() + " " + arr[arr.length - 1];
@@ -321,6 +330,26 @@ function convertScoretoDisplayName (scoreName) {
   } else if (scoreName === "playerScore") {
     return "Player";
   }
+  return undefined;
+}
+
+function newGame() {
+  prompt("Play new game? (y or n)");
+  let gameAnswer = rlSync.prompt().toLowerCase()[0];
+  while (gameAnswer !== 'y' && gameAnswer !== 'n') {
+    gameAnswer = rlSync.question("Invalid choice. Please enter y or n: ").toLowerCase()[0];
+  }
+  return gameAnswer === 'y';
+}
+
+function executeGame(board, startingPlayer, currentPlayer) {
+  while (true) {
+    displayBoard(board, startingPlayer);
+    chooseSquare(board, currentPlayer);
+    currentPlayer = alternatePlayer(currentPlayer); // why does the program still work with this commented out?
+    if (someoneWon(board) || boardFull(board)) break;
+  }
+  return undefined;
 }
 
 let acceptTerms = acceptStartingMethod();
@@ -334,7 +363,6 @@ if (acceptTerms) {
       ties: 0
     };
     let matchAnswer;
-    let gameAnswer;
 
     while (true) { // this loop starts a new game
       let board = initializeBoard();
@@ -343,12 +371,7 @@ if (acceptTerms) {
       let startingPlayer = determineStartingPlayer();
       let currentPlayer = startingPlayer;
 
-      while (true) {
-        displayBoard(board, startingPlayer);
-        chooseSquare(board, currentPlayer);
-        currentPlayer = alternatePlayer(currentPlayer); // why does the program still work with this commented out?
-        if (someoneWon(board) || boardFull(board)) break;
-      }
+      executeGame(board, startingPlayer, currentPlayer);
 
       displayBoard(board, startingPlayer);
 
@@ -361,20 +384,9 @@ if (acceptTerms) {
       updateScore(board, scores);
       displayScore(scores);
 
-      if (scores.computerScore < GAMES_REQUIRED_TO_WIN
-        && scores.playerScore < GAMES_REQUIRED_TO_WIN) {
-
-        prompt("Play new game? (y or n)");
-        gameAnswer = rlSync.prompt().toLowerCase()[0];
-        while (gameAnswer !== 'y' && gameAnswer !== 'n') {
-          gameAnswer = rlSync.question("Invalid choice. Please enter y or n: ").toLowerCase()[0];
-        }
-      }  // if answer is yes, reset scores for a new match to 5
-
-      if (gameAnswer !== 'y') break;
       if (scores.computerScore >= GAMES_REQUIRED_TO_WIN
-        || scores.playerScore >= GAMES_REQUIRED_TO_WIN) break;
-
+        || scores.playerScore >= GAMES_REQUIRED_TO_WIN
+        || !newGame()) break; // if newGame true, reset scores for a new match to 5
     }
 
     displayMatchOver(scores);
