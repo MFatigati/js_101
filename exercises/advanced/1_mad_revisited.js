@@ -79,7 +79,7 @@ function replacePlaceholder(placeholder) {
 }
 
 function madlibs(template) {
-  // let newStr = template.replace(/!\{(\w+)\}/g, replacePlaceholder($1));
+  // let newStr = template.replace(/(!\{\w+\})/g, replacePlaceholder($1));
   // let newStr = template.replace(/!\{\w+\}/g, replacePlaceholder(match));
   let newStr = template.replace(/!\{\w+\}/g, replacePlaceholder);
   return newStr; 
