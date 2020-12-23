@@ -79,15 +79,16 @@ function replacePlaceholder(placeholder) {
 }
 
 function madlibs(template) {
-  // let newStr = template.replace(/\$\{(\w+)\}/g, replacePlaceholder($1));
-  let newStr = template.replace(/\$\{\w+\}/g, replacePlaceholder);
+  // let newStr = template.replace(/!\{(\w+)\}/g, replacePlaceholder($1));
+  // let newStr = template.replace(/!\{\w+\}/g, replacePlaceholder(match));
+  let newStr = template.replace(/!\{\w+\}/g, replacePlaceholder);
   return newStr; 
 }
 
 
-let template1 = 'The ${adjective} brown ${noun} ${adverb} ${verb} the ${adjective} yellow ${noun}, who ${adverb} ${verb} his ${noun} and looks around.';
+let template1 = 'The !{adjective} brown !{noun} !{adverb} !{verb} the !{adjective} yellow !{noun}, who !{adverb} !{verb} his !{noun} and looks around.';
 
-let template2 = "The ${noun} ${verb} the ${noun}'s ${noun}.";
+let template2 = "The !{noun} !{verb} the !{noun}'s !{noun}.";
 
 console.log(madlibs(template1));
 console.log(madlibs(template1));
