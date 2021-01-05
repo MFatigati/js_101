@@ -64,6 +64,7 @@ function updateHandValue(player, valuesObject, hands) {
 // the following version of updateHandValue does not work because it does not
 // take into account the sum total
 // of the preceding cards, leading to an error when an Ace leads to a bust
+// improved version above
 /* function updateHandValue(player, valuesObject, hands) {
   valuesObject[player] = hands[player]
   .map(determineCardValue).reduce((val, acc) => acc += val);
@@ -73,6 +74,13 @@ function removeDealtCard(card, deck) {
   deck.splice(deck.indexOf(card), 1);
 }
 
+
+// in dealInitialCards and dealNewCard the program selects a random card
+// from a shuffled deck, and then removes the selected cards. This works, but
+// it doesn't quite reflect how actual dealing works, and it creates an
+// unnecessary amount of randomness. Almost like shuffling again each deal
+// LS version just deals first two from shuffled deck, then uses pop() to
+// remove from them the beginning of the shuffled deck array.
 function dealInitialCards(deck, hands) {
   let humanCard1 = generateRandomCard(deck);
   hands.human.push(humanCard1);
@@ -97,6 +105,7 @@ function dealNewCard(player, deck, hands) {
 }
 
 function displayGameState(hands, values, isHumanTurn) {
+  console.log('-------------');
   let humanCards = constructCurrentHand("human", hands);
   let computerCards = constructCurrentHand("computer", hands);
 
@@ -135,7 +144,6 @@ function determineWinner(valuesObject) {
 }
 
 function displayWinner(winStatus) {
-  //console.log(" ");
   if (winStatus === "human bust") {
     console.log("=> Player busts, dealer wins.");
   } else if (winStatus === "computer bust") {
@@ -154,7 +162,6 @@ function humanTurn(hands, values, deck) {
   let humanChoice = "hit";
   let bust = false;
   while (humanChoice === "hit" && bust === false) {
-    // console.log(" ");
     displayGameState(hands, values, true);
     console.log(" ");
     let choice = rlSync.question("Type \"s\" to stay, or \"h\" to hit: ").trim().toLowerCase()[0];
@@ -180,14 +187,22 @@ function busted(valuesObject) {
 
 function computerTurn(values, hands, deck) {
   while (values.computer < COMPUTER_MIN_VALUE && values.human < BUST_VALUE) {
+    // Added second part of condition so that computer did not continue betting,
+    // and accidentally bust, if the player had already busted. To make the
+    // computer a little more aggressive, so that it bets when player has not
+    // busted, but player score is still higher (even if the comp has already
+    // reached 17), change condition to
+    // ```values.computer < values.human && values.human < BUST_VALUE```
+    // Would need to modify presentation of rules in startPlay to account for
+    // this change
     dealNewCard("computer", deck, hands);
-    // console.log(CARDS_IN_HAND);
     updateHandValue("computer", values, hands);
     // maybe add feature to see next computer move?
   }
 }
 
 function playAgain() {
+  console.log('-------------');
   let playAgain = rlSync.question("Would you like to play again (y/n)? ").trim().toLowerCase()[0];
   while (playAgain !== "y" && playAgain !== "n") {
     playAgain = rlSync.question("Invalid choice. Please enter \"y\" or \"n\": ").trim().toLowerCase()[0];
@@ -199,7 +214,11 @@ function playAgain() {
 
 function startPlay() {
   console.clear();
-  console.log("Welcome to 21! Are you ready to play (y/n)?");
+  console.log(`Welcome to ${BUST_VALUE - 1}!
+  
+Rules: This is a card game, using a 52 card deck. Player or computer will lose automatically ("bust") if their score exceeds ${BUST_VALUE - 1}. Player goes first, and will get dealt additional cards ("hit") until they either choose to stop being dealt cards ("stay"), or until they "bust." Assuming the player has not "busted", the computer will then "hit" until it reaches a score of at least ${COMPUTER_MIN_VALUE}, or "busts." Ties are possible.
+  
+Are you ready to play (y/n)?`);
   let ready = rlSync.prompt().trim().toLowerCase()[0];
   while (ready !== "y" && ready !== "n") {
     ready = rlSync.question("Invalid choice. Please enter \"y\" or \"n\": ").trim().toLowerCase()[0];
@@ -233,7 +252,6 @@ while (ready) {
   humanTurn(currentHands, currentValues, deck);
   computerTurn(currentValues, currentHands, deck);
 
-  // console.log(" ");
   displayGameState(currentHands, currentValues, false);
   console.log(" ");
   displayWinner(determineWinner(currentValues));
