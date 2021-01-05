@@ -9,15 +9,8 @@
 7. Compare cards and declare winner. */
 const rlSync = require("readline-sync");
 
-const CARDS_IN_HAND = {
-  human: [],
-  computer: []
-}
-
-const HAND_VALUE = {
-  human: 0,
-  computer: 0
-}
+const COMPUTER_MIN_VALUE = 17;
+const BUST_VALUE = 22;
 
 function createUnshuffledDeck() {
   let suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
@@ -26,9 +19,9 @@ function createUnshuffledDeck() {
 
   suits.forEach(suit => {
     values.forEach(value => {
-      unshuffledDeckArray.push(`${value} of ${suit}`)
-    })
-  })
+      unshuffledDeckArray.push(`${value} of ${suit}`);
+    });
+  });
   return unshuffledDeckArray;
 }
 
@@ -58,6 +51,24 @@ function determineCardValue(card, currentHandValue) {
   } else return 10; // face cards
 }
 
+function updateHandValue(player, valuesObject, hands) {
+  let newValue = 0;
+
+  hands[player].forEach(card => {
+    newValue += determineCardValue(card, newValue);
+  });
+
+  valuesObject[player] = newValue;
+}
+
+// the following version of updateHandValue does not work because it does not
+// take into account the sum total
+// of the preceding cards, leading to an error when an Ace leads to a bust
+/* function updateHandValue(player, valuesObject, hands) {
+  valuesObject[player] = hands[player]
+  .map(determineCardValue).reduce((val, acc) => acc += val);
+} */
+
 function removeDealtCard(card, deck) {
   deck.splice(deck.indexOf(card), 1);
 }
@@ -85,50 +96,150 @@ function dealNewCard(player, deck, hands) {
   hands[player].push(newCard);
 }
 
-function updateHandValue(player, valuesObject, hands) {
-  valuesObject[player] = hands[player].map(determineCardValue).reduce((val, acc) => acc += val);
+function displayGameState(hands, values, isHumanTurn) {
+  let humanCards = constructCurrentHand("human", hands);
+  let computerCards = constructCurrentHand("computer", hands);
+
+  if (isHumanTurn === true) {
+    console.log(`Dealer has: ${hands.computer[0]} and an unknown card.
+You have: ${humanCards} (total value: ${values.human})`);
+  } else {
+    console.log(`Dealer has: ${computerCards} (total value: ${values.computer})
+You have: ${humanCards} (total value: ${values.human})`);
+  }
 }
 
-function displayGameStateHumanTurn(hands, valuesObject) {
-  let humanCards = "";
-  for (let card = 0; card < hands.human.length - 1; card += 1) {
+function constructCurrentHand(player, hands) {
+  let currentHand = "";
+  for (let card = 0; card < hands[player].length - 1; card += 1) {
     if (card === 0) {
-      humanCards += hands.human[card];
+      currentHand += hands[player][card];
     } else if (card > 0) {
-      humanCards += ", " + hands.human[card];
+      currentHand += ", " + hands[player][card];
     }
   }
-  humanCards += " and " + hands.human[hands.human.length - 1];
-  
-  console.log(`Dealer has: ${hands.computer[0]} and an unknown card.
-Player has: ${humanCards} (total value: ${HAND_VALUE.human})`)
+  currentHand += " and " + hands[player][[hands[player].length - 1]];
+  return currentHand;
 }
 
-let deck = initializeShuffledDeck(createUnshuffledDeck());
+function determineWinner(valuesObject) {
+  if (valuesObject.human > 21) {
+    return "human bust";
+  } else if (valuesObject.computer > 21) {
+    return "computer bust";
+  } else if (valuesObject.human > valuesObject.computer) {
+    return "player high score";
+  } else if (valuesObject.human < valuesObject.computer) {
+    return "computer high score";
+  } else return "tie";
+}
 
-dealInitialCards(deck, CARDS_IN_HAND);
-updateHandValue("human", HAND_VALUE, CARDS_IN_HAND);
-updateHandValue("computer", HAND_VALUE, CARDS_IN_HAND);
-
-let humanChoice = "hit";
-let bust = false;
-
-while (humanChoice === "hit" && bust === false) {
-  displayGameStateHumanTurn(CARDS_IN_HAND, HAND_VALUE);
-  let choice = rlSync.question("Type \"s\" to stay, or \"h\" to hit: ").trim()[0];
-  while (choice !== "s" && choice !== "h") {
-    choice = rlSync.question("Invalid choice. Type \"s\" to stay, or \"h\" to hit: ").trim()[0];   
+function displayWinner(winStatus) {
+  //console.log(" ");
+  if (winStatus === "human bust") {
+    console.log("=> Player busts, dealer wins.");
+  } else if (winStatus === "computer bust") {
+    console.log("=> Dealer busts, player wins.");
+  } else if (winStatus === "player high score") {
+    console.log("=> Player wins with higher score.");
+  } else if (winStatus === "computer high score") {
+    console.log("=> Computer wins with higher score.");
+  } else if (winStatus === "tie") {
+    console.log("=> It's a tie.");
   }
-  if (choice === "s") {
-    humanChoice = "stay";
-  }
+  console.log(" ");
+}
 
-  dealNewCard("human", deck, CARDS_IN_HAND);
-  console.log(CARDS_IN_HAND);
-  updateHandValue("human", HAND_VALUE, CARDS_IN_HAND);
-
-  if (HAND_VALUE.human > 21) { // extract?
-    bust = true;
-    console.log("Busted!")
+function humanTurn(hands, values, deck) {
+  let humanChoice = "hit";
+  let bust = false;
+  while (humanChoice === "hit" && bust === false) {
+    // console.log(" ");
+    displayGameState(hands, values, true);
+    console.log(" ");
+    let choice = rlSync.question("Type \"s\" to stay, or \"h\" to hit: ").trim().toLowerCase()[0];
+    while (choice !== "s" && choice !== "h") {
+      choice = rlSync.question("Invalid choice. Type \"s\" to stay, or \"h\" to hit: ").trim().toLowerCase()[0];
+    }
+    if (choice === "s") {
+      humanChoice = "stay";
+    } else {
+      dealNewCard("human", deck, hands);
+      updateHandValue("human", values, hands);
+    }
+    bust = busted(values);
+    console.log(" ");
   }
 }
+
+function busted(valuesObject) {
+  if (valuesObject.human >= BUST_VALUE) {
+    return true;
+  } else return false;
+}
+
+function computerTurn(values, hands, deck) {
+  while (values.computer < COMPUTER_MIN_VALUE && values.human < BUST_VALUE) {
+    dealNewCard("computer", deck, hands);
+    // console.log(CARDS_IN_HAND);
+    updateHandValue("computer", values, hands);
+    // maybe add feature to see next computer move?
+  }
+}
+
+function playAgain() {
+  let playAgain = rlSync.question("Would you like to play again (y/n)? ").trim().toLowerCase()[0];
+  while (playAgain !== "y" && playAgain !== "n") {
+    playAgain = rlSync.question("Invalid choice. Please enter \"y\" or \"n\": ").trim().toLowerCase()[0];
+  }
+  if (playAgain === "n") {
+    return false;
+  } else return true;
+}
+
+function startPlay() {
+  console.clear();
+  console.log("Welcome to 21! Are you ready to play (y/n)?");
+  let ready = rlSync.prompt().trim().toLowerCase()[0];
+  while (ready !== "y" && ready !== "n") {
+    ready = rlSync.question("Invalid choice. Please enter \"y\" or \"n\": ").trim().toLowerCase()[0];
+  }
+  if (ready === "n") {
+    return false;
+  } else return true;
+}
+
+
+let ready = startPlay();
+
+while (ready) {
+  let deck = initializeShuffledDeck(createUnshuffledDeck());
+  let currentHands = {
+    human: [],
+    computer: []
+  };
+
+  let currentValues = {
+    human: 0,
+    computer: 0
+  };
+
+  dealInitialCards(deck, currentHands);
+  updateHandValue("human", currentValues, currentHands);
+  updateHandValue("computer", currentValues, currentHands);
+
+  console.clear();
+
+  humanTurn(currentHands, currentValues, deck);
+  computerTurn(currentValues, currentHands, deck);
+
+  // console.log(" ");
+  displayGameState(currentHands, currentValues, false);
+  console.log(" ");
+  displayWinner(determineWinner(currentValues));
+
+  ready = playAgain();
+}
+console.clear();
+console.log("Thanks for playing 21!");
+console.log(" ");
